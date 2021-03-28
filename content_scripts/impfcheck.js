@@ -177,10 +177,10 @@
     var infodiv = document.createElement("DIV");
     var infotext = document.createElement("P");
     var infotext2 = document.createElement("P");
-    infotext.innerHTML = message;
+    infotext.textContent = message;
     infotext.style.fontSize = "25px";
     infotext.style.textAlign="center";
-    infotext2.innerHTML = 'ImpfCheck-Addon';
+    infotext2.textContent = 'ImpfCheck-Addon';
     infotext2.style.fontSize = "16px";
     infotext2.style.paddingRight = "25px";
     infotext2.style.textAlign="right";

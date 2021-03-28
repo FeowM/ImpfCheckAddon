@@ -90,7 +90,7 @@ function listenForClicks() {
     function showWrongSiteMessage(mode){
     	if(mode==1){
     		showMessage("Falsches Fenster. Bitte öffnen Sie die Website.", true);
-      		document.querySelector("#error-link").innerHTML="Hier";
+      		document.querySelector("#error-link").textContent="Hier";
       		document.querySelector("#error-link").onclick= function(event){openImpfTerminSite();};
     	}
       	if(mode==2){
@@ -105,12 +105,12 @@ function listenForClicks() {
     function showMessage(message, withLink){
 		if(withLink==false){
 			document.querySelector("#error-link").style.display="none";
-			document.querySelector("#error-link").innerHTML="";
+			document.querySelector("#error-link").textContent="";
 			document.querySelector("#error-link").onclick= "";
 		}
       	document.querySelector("#popup-content").classList.add("hidden");
       	document.querySelector("#error-content").classList.remove("hidden");
-      	document.querySelector("#error-message").innerHTML=message;
+      	document.querySelector("#error-message").textContent=message;
     }
 
     function openPage(pageNum) {
