@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="main.css"/>
+  </head>
+
+<body>
+  <div id="popup-content">
+    <div class="button start">Start</div>
+    <div class="button stop">Stop</div>
+    <br>
+    <div class="button default settings">Einstellungen</div>
+    <div class="button default help">Hilfe</div>
+  </div>
+  <div id="popup-content2" class="hiddenPopup">
+    <span class="button default goback">zurück</span>
+    <p>Um Benachrichtigungen auf Ihr Handy zu empfangen, wenn ein Impftermin frei ist, gehen Sie bitte in die Einstellungen und tragen Sie dort die von der App generierte URL ein.</p>
+    <p>Sie können nachfolgende App verwenden, um sogenannte WebHooks zu empfangen:</p>
+    <ul>
+      <li>Android: <a href="https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid">Macrodroid</a></li>
+      <li>iOS: <a href="https://apps.apple.com/de/app/push-custom-notifications/id1444391917">Push: custom notifications</a></li>
+    </ul>
+    <br>
+    <p><a href="">Hier</a> gibt es von mir bereits vorgefertigte Macrodroid - Macros, welche nur noch durch einen Klick installiert werden müssen. Natürlich muss zuerst die App installiert werden.</p>
+    <br>
+    <p>Haftungsausschluss: Ich übernehme keinerlei Verantwortung für die Nutzung und den evtl. entstandenen Schäden durch die oben erwähnten Apps. Die Apps dienen lediglich als Vorschlag. Es können daher auch gerne Alternativen verwendet werden.</p>
+  </div>
+  <div id="popup-content3" class="hiddenPopup">
+    <label for="impfavail">URL für Impftermin verfügbar:</label>
+    <input type="text" id="impfavail" name="impfavail">
+    <label for="impferror">URL für Fehlermeldung:</label>
+    <input type="text" id="impferror" name="impferror">
+    <label for="impfalive">URL für Lebenszeichen (optional):</label>
+    <input type="text" id="impfalive" name="impfalive">
+    <br>
+    <br>
+    <span class="button default dosave">Speichern</span>
+    <span class="button default goback">Abbrechen</span>
+  </div>
+  <div id="error-content" class="hidden">
+    <p id="error-message">Fehler auf dieser Website.</p>
+    <div id="error-link" class="button default"></div>
+  </div>
+  <script src="main.js"></script>
+</body>
+
+</html>

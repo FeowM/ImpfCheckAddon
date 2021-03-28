@@ -1,0 +1,29 @@
+{
+
+  "manifest_version": 2,
+  "name": "ImpfCheck",
+  "version": "1.0",
+
+  "description": "Prüft die Website impfterminservice.de auf neue verfügbare Impftermine.",
+  "icons": {
+    "48": "icons/impfung48.png",
+    "64": "icons/impfung64.png"
+  },
+
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+
+  "browser_action": {
+    "default_icon": "icons/impfung32.png",
+    "default_title": "ImpfCheck",
+    "default_popup": "popup/main.html"
+  },
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "impfcheck@feow"
+    }
+  }
+}
