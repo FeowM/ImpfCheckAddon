@@ -18,6 +18,7 @@ Die oben aufgeführten Apps sind lediglich eine Empfehlung. Ich übernehme keine
 # Macro-Vorlagen für Macrodroid
 Nachfolgend habe ich bereits 3 Macro-Vorlagen für Macrodroid programmiert. Diese können - nachdem die <a href="https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid" target="_blank">App</a> zuvor installiert wurde - einfach durch einen Klick auf die Datei, installiert werden. Somit muss nur noch die URL, welche unter dem "Auslöser" (roter Hintergrund, ganz oben) steht, in die Einstellungen des Addons eingefügt werden.
 
+Bitte mit "Rechtsklick -> Ziel speichern unter" auf dem Endgerät (Android) abspeichern.
 <ul>
   <li>Macro für Impfung verfügbar - Benachrichtigung: <a href="https://github.com/FeowM/ImpfCheckAddon/raw/main/macrodroid_macros/ImpfAvail.macro">Download</a></li>
   <li>Macro für Impfung Fehlgeschlagen - Benachrichtigung: <a href="https://github.com/FeowM/ImpfCheckAddon/raw/main/macrodroid_macros/ImpfError.macro">Download</a></li>
