@@ -35,7 +35,6 @@
   function injectScript() {
     console.log("injected");
     showScriptInjected();
-    sendWebHook(urlImpfAvail);
     var searchBtn = document.getElementsByClassName("btn btn-magenta kv-btn kv-btn-round search-filter-button");
     if(searchBtn.length>0){ if(searchBtn[0]!= null){
       searchBtn[0].click();
