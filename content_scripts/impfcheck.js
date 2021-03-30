@@ -27,13 +27,18 @@
   }
   window.hasRun = true;
   var a;
+  var b;
+  var c;
   var z;
   var urlImpfAvail = "";
   var urlImpfError = "";
   var urlImpfAlive = "";
+  var activeTabID = 0;
+  var timercounter = 11;
+  var intervalTime = 660000; // 11 Minuten.
 
   function injectScript() {
-    console.log("injected");
+    console.log("startScript");
     showScriptInjected();
     var searchBtn = document.getElementsByClassName("btn btn-magenta kv-btn kv-btn-round search-filter-button");
     if(searchBtn.length>0){ if(searchBtn[0]!= null){
@@ -43,30 +48,7 @@
       }, 5000); // 5 Sekunden warten.
     }}
 
-    a = window.setInterval(function () {
-      var done = false;
-      var o = document.getElementsByClassName("its-search-step-info");
-      if(o.length>0){ if(o[0]!= null){
-        var p = o[0].getElementsByClassName("text-magenta");
-        if(p.length>0){ if(p[0]!= null){
-          p[0].click();
-          setTimeout(function(){
-              if(checkImpfAvailable()==true){done=true;}
-            }, 20000); // 20 Sekunden warten.
-        }}
-      }} 
-
-      // Pruefe, ob alles okay:
-      setTimeout(function(){
-        if(done==false){
-          // Etwas stimmt nicht oder es gibt Termine:
-          console.log("Es gibt Termine oder etwas stimmt nicht.");
-          sendWebHook(urlImpfError);
-          removeScript();
-        }
-        done=false;
-      }, 40000); // 40 Sekunden warten.
-    }, 660000); // 11 Minuten warten.
+    a = window.setInterval(checkImpfReservTime, intervalTime);
 
     if(urlImpfAlive!=null && urlImpfAlive!="") {
       // Lebenszeichen:
@@ -76,6 +58,66 @@
     }
   }
 
+  b = window.setInterval(function () {timercounter--; console.log(timercounter);}, 60000); // Jede Minute.
+
+  function checkImpfReservTime()
+  {
+  	if(checkReservFinished()==true){ // Wenn Zeit abgelaufen:
+  		console.log("Zeit abgelaufen.");
+  		intervalTime = 660000; // 11 Minuten.
+  		clearInterval(a);
+		doImpfCheck();
+	}else{ // Wenn Zeit nicht abgelaufen:
+		console.log("Zeit nicht abgelaufen. Warte.");
+		intervalTime = 60000; // Jede Minute.
+		clearInterval(a);
+	}  
+	a = setInterval(checkImpfReservTime, intervalTime); // Rufe nach intervalTime-Minute erneut diese Funktion auf.
+  }
+
+  function checkReservFinished(){
+  	var counterElem = document.getElementsByTagName("strong");
+	var foundCounterText = "";
+	for(var i=0;i<mySpans.length;i++){
+    	if(counterElem[i].innerHTML.includes('min ')){
+			foundCounterText = counterElem[i].innerHTML;
+			break;
+		}
+	}
+
+	if(foundCounterText=="" || foundCounterText!="00min 00s"){
+		return false;
+	}
+	return true;
+  }
+
+  function doImpfCheck()
+  {
+  	  timercounter=11;
+	  var done = false;
+	  var o = document.getElementsByClassName("its-search-step-info");
+	  if(o.length>0){ if(o[0]!= null){
+	    var p = o[0].getElementsByClassName("text-magenta");
+	    if(p.length>0){ if(p[0]!= null){
+	      p[0].click();
+	      setTimeout(function(){
+	          if(checkImpfAvailable()==true){done=true;}
+	        }, 20000); // 20 Sekunden warten.
+	    }}
+	  }} 
+
+	  // Pruefe, ob alles okay:
+	  setTimeout(function(){
+	    if(done==false){
+	      // Etwas stimmt nicht oder es gibt Termine:
+	      console.log("Es gibt Termine oder etwas stimmt nicht.");
+	      sendWebHook(urlImpfError);
+	      removeScript();
+	    }
+	    done=false;
+	  }, 40000); // 40 Sekunden warten.
+  }
+
   function checkImpfAvailable() {
     var h = document.getElementsByClassName("d-flex flex-column its-slot-pair-search-info");
       if(h.length>0){ if(h[0]!= null){
@@ -83,8 +125,7 @@
         if(j.length>0){ if(j[0]!= null){
           if(j[0].innerHTML.includes("leider keine Termine"))
           {
-            console.log("Keine Termine");
-            document.getElementById("itsSearchAppointmentsModal").click();
+            impfNotAvailable();
           }else{
             // Nochmalige Pruefung, zur Sicherheit:
             var bodystring = document.documentElement.innerHTML;
@@ -124,6 +165,8 @@
   function removeScript() {
     console.log("removed");
     if(a!=null){clearInterval(a);}
+    if(b!=null){clearInterval(b);}
+    if(c!=null){clearInterval(c);}
     if(z!=null){clearInterval(z);}
     showScriptRemoved();
   }
@@ -134,6 +177,7 @@
       param1: hookurl,
       param2: "autoclose"
     });
+    sending();
   }
 
   /**
@@ -149,6 +193,7 @@
       urlImpfAvail = message.param1;
       urlImpfError = message.param2;
       urlImpfAlive = message.param3;
+      activeTabID  = message.param4;
     }
   });
 

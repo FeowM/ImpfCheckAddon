@@ -19,6 +19,7 @@
 var urlImpfAvail = "";
 var urlImpfError = "";
 var urlImpfAlive = "";
+var activeTabID = 0;
 
 /**
  * Listen for clicks on the buttons, and send the appropriate message to
@@ -36,6 +37,11 @@ function listenForClicks() {
     		return;
     	}
 
+    	if(getActiveTabID()!=0){
+    		showMessage('Es läuft bereits ein Script. Bitte zuerst auf "Stop" klicken.');
+    		return;
+    	}
+
       	browser.tabs.query({currentWindow: true, active: true}).then((tabs) => {
           let tab = tabs[0];
           if(tab.url==""){return;}
@@ -46,11 +52,10 @@ function listenForClicks() {
           			showWrongSiteMessage(3); return;
           		}else {
 	          		if(tab.url.includes("impfterminservice.de/impftermine/suche")==true){
-	          			browser.tabs.sendMessage(tabs[0].id, {
-			            	command: "impfCheckStart"
-			          	});
-
-			          	showMessage('Impfcheck gestartet. Nach ca. 11 Minuten wird das Script erneut auf den Button "Termine suchen" klicken. Sobald ein Termin verfügbar ist oder ein Fehler festgestellt wird, wird Sie das Addon über die zuvor in den Einstellungen gesetzten URLs benachrichtigen.');
+	          			setActiveTabID(tabs[0].id);
+	          			browser.tabs.executeScript({file: "/content_scripts/impfcheck.js"})
+						.then(startImpfChecker)
+						.catch(reportExecuteScriptError);
 	          		}
 	          	}
           	}
@@ -58,17 +63,20 @@ function listenForClicks() {
       	}, console.error);
     }
 
-    function impfcheckStop(tabs) {
-    	browser.tabs.query({currentWindow: true, active: true}).then((tabs) => {
-          let tab = tabs[0];
-          if(tab.url==""){return;}
-          if(tab.url.includes("impfterminservice.de")==false){return;}
-          browser.tabs.sendMessage(tabs[0].id, {
-            command: "impfCheckStop"
-          });
+    function startImpfChecker() {
+		updateWebHookURL();
+		browser.tabs.sendMessage(getActiveTabID(), {
+        	command: "impfCheckStart"
+      	});
+      	showMessage('Impfcheck gestartet. Nach ca. 11 Minuten wird das Script erneut auf den Button "Termine suchen" klicken. Sobald ein Termin verfügbar ist oder ein Fehler festgestellt wird, wird Sie das Addon über die zuvor in den Einstellungen gesetzten URLs benachrichtigen.');
+    }
 
-          showMessage('Impfcheck gestoppt.');
-      	}, console.error);
+    function impfcheckStop(tabs) {
+      browser.tabs.sendMessage(getActiveTabID(), {
+        command: "impfCheckStop"
+      });
+      resetActiveTabID();
+      showMessage('Impfcheck gestoppt.');
     }
 
     function openSettings() {
@@ -159,11 +167,7 @@ function listenForClicks() {
     			if(urlImpfAvail!=""){if(urlImpfAvail.includes("http")==false){urlImpfAvail="http://"+urlImpfAvail;}}
     			if(urlImpfError!=""){if(urlImpfError.includes("http")==false){urlImpfError="http://"+urlImpfError;}}
     			if(urlImpfAlive!=""){if(urlImpfAlive.includes("http")==false){urlImpfAlive="http://"+urlImpfAlive;}}
-    			browser.storage.sync.set({
-				    urlImpfAvail: urlImpfAvail,
-				    urlImpfError: urlImpfError,
-				    urlImpfAlive: urlImpfAlive
-				});
+    			updateFirefoxSettings(urlImpfAvail, urlImpfError, urlImpfAlive, "");
     			updateWebHookURL();
     			openPage(1);
     		break;
@@ -237,18 +241,27 @@ function openImpfTerminSite() {
 
 function updateWebHookURL()
 {
-	browser.tabs.query({currentWindow: true, active: true}).then((tabs) => {
-      	let tab = tabs[0];
-      	if(tab.url==""){return;}
-  		if(tab.url.includes("impfterminservice.de")==true){
-  		browser.tabs.sendMessage(tabs[0].id, {
-            command: "updateURL",
-            param1: urlImpfAvail,
-            param2: urlImpfError,
-            param3: urlImpfAlive
-          });
-  		}
-  	}, console.error);
+	if(getActiveTabID()==0){return;}
+	browser.tabs.sendMessage(getActiveTabID(), {
+	    command: "updateURL",
+	    param1: urlImpfAvail,
+	    param2: urlImpfError,
+	    param3: urlImpfAlive,
+	    param4: activeTabID
+	});
+}
+
+function updateFirefoxSettings(tmpUrlImpfAvail="", tempUrlImpfError="", tmpUrlImpfAlive="", tmpActiveTabID="") {
+	if(tmpUrlImpfAvail==""){tmpUrlImpfAvail=urlImpfAvail;}
+	if(tempUrlImpfError==""){tempUrlImpfError=urlImpfError;}
+	if(tmpUrlImpfAlive==""){tmpUrlImpfAlive=urlImpfAlive;}
+	if(tmpActiveTabID==""){tmpActiveTabID=activeTabID;}
+	browser.storage.sync.set({
+	    urlImpfAvail: tmpUrlImpfAvail,
+	    urlImpfError: tempUrlImpfError,
+	    urlImpfAlive: tmpUrlImpfAlive,
+	    activeTabID: tmpActiveTabID
+	});
 }
 
 function onImpfTerminSiteCreated(tab) {
@@ -263,9 +276,12 @@ function restoreOptions() {
 
   function setWebHookURLs(result) {
   	console.log("Get URLs");
+  	if(result==null || result.urlImpfAvail==null || result.urlImpfError==null || result.urlImpfAlive==null){return;}
+  	if(result==undefined || result.urlImpfAvail==undefined || result.urlImpfError==undefined || result.urlImpfAlive==undefined || result.activeTabID==undefined){return;}
   	urlImpfAvail = result.urlImpfAvail;
   	urlImpfError = result.urlImpfError;
   	urlImpfAlive = result.urlImpfAlive;
+  	activeTabID = result.activeTabID;
   	updateWebHookURL();
   }
 
@@ -273,30 +289,38 @@ function restoreOptions() {
     console.log(`Error: ${error}`);
   }
 
-  let getting = browser.storage.sync.get(["urlImpfAvail", "urlImpfError", "urlImpfAlive"]);
+  let getting = browser.storage.sync.get(["urlImpfAvail", "urlImpfError", "urlImpfAlive", "activeTabID"]);
   getting.then(setWebHookURLs, onError);
 }
 
+function resetActiveTabID()
+{
+	setActiveTabID(0);
+}
 
-/**
- * When the popup loads, inject a content script into the active tab,
- * and add a click handler.
- * If we couldn't inject the script, handle the error.
- */
-browser.tabs.executeScript({file: "/content_scripts/impfcheck.js"})
-.then(listenForClicks)
-.catch(reportExecuteScriptError);
+function setActiveTabID(id) {
+	activeTabID=id;
+	updateFirefoxSettings("", "", "", activeTabID);
+}
+
+function getActiveTabID() {
+	console.log(activeTabID);
+	return activeTabID;
+}
+
+listenForClicks();
 
 document.addEventListener("DOMContentLoaded", restoreOptions);
 
 
 function handleMessage(request, sender, sendResponse) {
+	console.log("Nachricht eingegangen.");
   	console.log(request);
   	if(request.command=="openTab" && request.param1!=""){
 	  	var creating = browser.tabs.create({
 		  url:request.param1
 		});
-		if(request.param2=="autoclose"){
+		if(request.param2=="autoclose" && request.param1!=""){
 			creating.then(onWebHookCreated, onWebHookError);
 		}
 	}
