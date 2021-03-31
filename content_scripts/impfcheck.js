@@ -70,13 +70,12 @@
   	if(checkReservFinished()==true){ // Wenn Zeit abgelaufen:
   		console.log("Zeit abgelaufen.");
   		intervalTime = 660000; // 11 Minuten.
-  		clearInterval(a);
 		doImpfCheck();
 	}else{ // Wenn Zeit nicht abgelaufen:
 		console.log("Zeit nicht abgelaufen. Warte.");
 		intervalTime = 60000; // Jede Minute.
-		clearInterval(a);
 	}  
+	clearInterval(a);
 	a = window.setInterval(checkImpfReservTime, intervalTime); // Rufe nach intervalTime-Minute erneut diese Funktion auf.
   }
 
@@ -166,6 +165,17 @@
   function impfNotAvailable() {
     console.log("Keine Termine");
     document.getElementById("itsSearchAppointmentsModal").click();
+
+    // Nach 7 Sekunden erneut pruefen, ob die Zeit nun wieder von vorne beginnt. Wenn nicht, dann nochmal Link anklicken:
+    setTimeout(function(){
+	    if(checkReservFinished()==true){ // Wenn Zeit abgelaufen:
+	  		console.log("Zeit ist immer noch 0. Komisch. Link erneut anklicken.");
+	  		intervalTime = 660000; // 11 Minuten.
+	  		clearInterval(a);
+			doImpfCheck();
+			a = window.setInterval(checkImpfReservTime, intervalTime); // Rufe nach intervalTime-Minute erneut diese Funktion auf.
+		}
+	}, 7000); 
   }
 
   function impfIsAvailable() {
