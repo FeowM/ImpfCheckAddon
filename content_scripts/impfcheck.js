@@ -58,7 +58,12 @@
     }
   }
 
-  b = window.setInterval(function () {timercounter--; console.log(timercounter);}, 60000); // Jede Minute.
+  b = window.setInterval(doCountTimer, 60000); // Jede Minute.
+
+  function doCountTimer() {
+  	timercounter--;
+  	console.log(timercounter);
+  }
 
   function checkImpfReservTime()
   {
@@ -72,19 +77,18 @@
 		intervalTime = 60000; // Jede Minute.
 		clearInterval(a);
 	}  
-	a = setInterval(checkImpfReservTime, intervalTime); // Rufe nach intervalTime-Minute erneut diese Funktion auf.
+	a = window.setInterval(checkImpfReservTime, intervalTime); // Rufe nach intervalTime-Minute erneut diese Funktion auf.
   }
 
   function checkReservFinished(){
   	var counterElem = document.getElementsByTagName("strong");
 	var foundCounterText = "";
-	for(var i=0;i<mySpans.length;i++){
+	for(var i=0;i<counterElem.length;i++){
     	if(counterElem[i].innerHTML.includes('min ')){
 			foundCounterText = counterElem[i].innerHTML;
 			break;
 		}
 	}
-
 	if(foundCounterText=="" || foundCounterText!="00min 00s"){
 		return false;
 	}
@@ -94,13 +98,21 @@
   function doImpfCheck()
   {
   	  timercounter=11;
+  	  clearInterval(b);
+  	  b = window.setInterval(doCountTimer, 60000); // Restart.
 	  var done = false;
+	  console.log("Gefunden 0");
 	  var o = document.getElementsByClassName("its-search-step-info");
 	  if(o.length>0){ if(o[0]!= null){
+	  	console.log("Gefunden 1");
+	  	console.log(o[0]);
 	    var p = o[0].getElementsByClassName("text-magenta");
 	    if(p.length>0){ if(p[0]!= null){
-	      p[0].click();
-	      setTimeout(function(){
+	    	console.log("Gefunden 2. Geklickt.");
+	    	console.log(p[0]);
+	      	p[0].click();
+	      	console.log("geklickt.");
+	      	setTimeout(function(){
 	          if(checkImpfAvailable()==true){done=true;}
 	        }, 20000); // 20 Sekunden warten.
 	    }}
