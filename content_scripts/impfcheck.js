@@ -27,7 +27,7 @@
   }
   window.hasRun = true;
   var a;
-  var b;
+  //var b;
   var c;
   var z;
   var urlImpfAvail = "";
@@ -38,7 +38,6 @@
   var intervalTime = 660000; // 11 Minuten.
 
   function injectScript() {
-    console.log("startScript");
     showScriptInjected();
     var searchBtn = document.getElementsByClassName("btn btn-magenta kv-btn kv-btn-round search-filter-button");
     if(searchBtn.length>0){ if(searchBtn[0]!= null){
@@ -58,21 +57,20 @@
     }
   }
 
+  /*
   b = window.setInterval(doCountTimer, 60000); // Jede Minute.
 
   function doCountTimer() {
   	timercounter--;
-  	console.log(timercounter);
   }
+  */
 
   function checkImpfReservTime()
   {
   	if(checkReservFinished()==true){ // Wenn Zeit abgelaufen:
-  		console.log("Zeit abgelaufen.");
   		intervalTime = 660000; // 11 Minuten.
 		doImpfCheck();
 	}else{ // Wenn Zeit nicht abgelaufen:
-		console.log("Zeit nicht abgelaufen. Warte.");
 		intervalTime = 60000; // Jede Minute.
 	}  
 	clearInterval(a);
@@ -97,15 +95,14 @@
   function doImpfCheck()
   {
 	  timercounter=11;
-	  clearInterval(b);
-	  b = window.setInterval(doCountTimer, 60000); // Restart.
+	  //clearInterval(b);
+	  //b = window.setInterval(doCountTimer, 60000); // Restart.
 	  var done = false;
 	  var o = document.getElementsByClassName("its-search-step-info");
 	  if(o.length>0){ if(o[0]!= null){
 	    var p = o[0].getElementsByClassName("text-magenta");
 	    if(p.length>0){ if(p[0]!= null){
         simulateClick(p[0]);
-	      	console.log("geklickt.");
 	      	setTimeout(function(){
 	          if(checkImpfAvailable()==true){done=true;}
 	        }, 20000); // 20 Sekunden warten.
@@ -116,7 +113,6 @@
 	  setTimeout(function(){
 	    if(done==false){
 	      // Etwas stimmt nicht oder es gibt Termine:
-	      console.log("Es gibt Termine oder etwas stimmt nicht.");
 	      sendWebHook(urlImpfError);
 	      removeScript();
 	    }
@@ -148,7 +144,6 @@
     // Fallback: Sollte sich der HTML-Code verändert haben:
     var bodystring = document.documentElement.innerHTML;
     if(bodystring.includes("leider keine Termine")==true){
-      console.log("FALLBACK");
       impfNotAvailable();
       return true; // nur hier.
     }else{
@@ -158,13 +153,11 @@
   }
 
   function impfNotAvailable() {
-    console.log("Keine Termine");
     document.getElementById("itsSearchAppointmentsModal").click();
 
     // Nach 7 Sekunden erneut pruefen, ob die Zeit nun wieder von vorne beginnt. Wenn nicht, dann nochmal Link anklicken:
     setTimeout(function(){
 	    if(checkReservFinished()==true){ // Wenn Zeit abgelaufen:
-	  		console.log("Zeit ist immer noch 0. Komisch. Link erneut anklicken.");
 	  		intervalTime = 660000; // 11 Minuten.
 	  		clearInterval(a);
   			doImpfCheck();
@@ -174,15 +167,13 @@
   }
 
   function impfIsAvailable() {
-    console.log("Es gibt Termine");
     sendWebHook(urlImpfAvail);
     removeScript();
   }
 
   function removeScript() {
-    console.log("removed");
     if(a!=null){clearInterval(a);}
-    if(b!=null){clearInterval(b);}
+    //if(b!=null){clearInterval(b);}
     if(c!=null){clearInterval(c);}
     if(z!=null){clearInterval(z);}
     showScriptRemoved();
@@ -215,7 +206,6 @@
     } else if (message.command === "impfCheckStop") {
       removeScript();
     } else if (message.command === "updateURL") {
-      console.log("UPDATE URL");
       urlImpfAvail = message.param1;
       urlImpfError = message.param2;
       urlImpfAlive = message.param3;
