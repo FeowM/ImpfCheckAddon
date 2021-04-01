@@ -96,20 +96,15 @@
 
   function doImpfCheck()
   {
-  	  timercounter=11;
-  	  clearInterval(b);
-  	  b = window.setInterval(doCountTimer, 60000); // Restart.
+	  timercounter=11;
+	  clearInterval(b);
+	  b = window.setInterval(doCountTimer, 60000); // Restart.
 	  var done = false;
-	  console.log("Gefunden 0");
 	  var o = document.getElementsByClassName("its-search-step-info");
 	  if(o.length>0){ if(o[0]!= null){
-	  	console.log("Gefunden 1");
-	  	console.log(o[0]);
 	    var p = o[0].getElementsByClassName("text-magenta");
 	    if(p.length>0){ if(p[0]!= null){
-	    	console.log("Gefunden 2. Geklickt.");
-	    	console.log(p[0]);
-	      	p[0].click();
+        simulateClick(p[0]);
 	      	console.log("geklickt.");
 	      	setTimeout(function(){
 	          if(checkImpfAvailable()==true){done=true;}
@@ -172,10 +167,10 @@
 	  		console.log("Zeit ist immer noch 0. Komisch. Link erneut anklicken.");
 	  		intervalTime = 660000; // 11 Minuten.
 	  		clearInterval(a);
-			doImpfCheck();
-			a = window.setInterval(checkImpfReservTime, intervalTime); // Rufe nach intervalTime-Minute erneut diese Funktion auf.
-		}
-	}, 7000); 
+  			doImpfCheck();
+  			a = window.setInterval(checkImpfReservTime, intervalTime); // Rufe nach intervalTime-Minute erneut diese Funktion auf.
+  		}
+  	}, 7000); 
   }
 
   function impfIsAvailable() {
@@ -201,6 +196,15 @@
     });
     sending();
   }
+
+  var simulateClick = function (elem) {
+    var evt = new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true,
+      view: window
+    });
+    var canceled = !elem.dispatchEvent(evt);
+  };
 
   /**
    * Listen for messages from the background script.
