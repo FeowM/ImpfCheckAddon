@@ -2,7 +2,7 @@
 
   "manifest_version": 2,
   "name": "ImpfCheck",
-  "version": "1.0",
+  "version": "1.1",
 
   "description": "Prüft die Website impfterminservice.de auf neue verfügbare Impftermine.",
   "icons": {
