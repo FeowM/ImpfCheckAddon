@@ -158,6 +158,7 @@
     // Nach 7 Sekunden erneut pruefen, ob die Zeit nun wieder von vorne beginnt. Wenn nicht, dann nochmal Link anklicken:
     setTimeout(function(){
 	    if(checkReservFinished()==true){ // Wenn Zeit abgelaufen:
+			sendCanvasData();
 	  		intervalTime = 660000; // 11 Minuten.
 	  		clearInterval(a);
   			doImpfCheck();
@@ -196,6 +197,13 @@
     });
     var canceled = !elem.dispatchEvent(evt);
   };
+  
+  function sendCanvasData() {
+	var z = document.getElementsByClassName("app-wrapper");
+	if(z==null){return;}
+	if(z.length==0){return;}
+	z[0].dispatchEvent(new Event('mousedown'));
+  }
 
   /**
    * Listen for messages from the background script.

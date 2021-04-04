@@ -87,6 +87,10 @@ function listenForClicks() {
     function openHelp() {
     	openPage(2);
     }
+	
+	function openUpdateURL() {
+		openUpdateSite();
+	}
 
     /**
      * Just log the error to the console.
@@ -219,6 +223,9 @@ function listenForClicks() {
     else if (e.target.classList.contains("dosave")) {
       saveSettings();
     }
+	else if (e.target.classList.contains("update")) {
+      openUpdateURL();
+    }
   });
 }
 
@@ -235,6 +242,13 @@ function reportExecuteScriptError(error) {
 function openImpfTerminSite() {
   var creating = browser.tabs.create({
     url:"https://impfterminservice.de"
+  });
+  creating.then(onImpfTerminSiteCreated, onImpfTerminSiteError);
+}
+
+function openUpdateSite() {
+  var creating = browser.tabs.create({
+    url:"https://github.com/FeowM/ImpfCheckAddon/tree/main/firefoxRelease"
   });
   creating.then(onImpfTerminSiteCreated, onImpfTerminSiteError);
 }
