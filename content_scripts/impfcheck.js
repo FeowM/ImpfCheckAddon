@@ -181,12 +181,27 @@
   }
 
   function sendWebHook(hookurl) {
+	let xhr = new XMLHttpRequest();
+	xhr.onload = function () {
+		console.log("done");
+	};
+
+	xhr.onerror = function (e) {
+		console.log('An error occurred');
+		console.log(e);
+	}
+	xhr.open('GET', hookurl, true);
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.send();
+  	return;
+  	/*
     var sending = browser.runtime.sendMessage({
       command: "openTab",
       param1: hookurl,
       param2: "autoclose"
     });
     sending();
+    */
   }
 
   var simulateClick = function (elem) {
