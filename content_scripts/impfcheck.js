@@ -36,6 +36,7 @@
   var activeTabID = 0;
   var timercounter = 11;
   var intervalTime = 660000; // 11 Minuten.
+  var errcounter = 0;
 
   function injectScript() {
     showScriptInjected();
@@ -158,12 +159,21 @@
     // Nach 7 Sekunden erneut pruefen, ob die Zeit nun wieder von vorne beginnt. Wenn nicht, dann nochmal Link anklicken:
     setTimeout(function(){
 	    if(checkReservFinished()==true){ // Wenn Zeit abgelaufen:
+      errcounter++;
+      if(errcounter>2){ // Wenn Zeit nach dem 3. Versuch immernoch nicht startet:
+        errcounter=0;
+        // Rufe die derzeitige URL noch einmal auf (AJAX):
+        console.log("Reopen site with AJAX.");
+        sendWebHook(window.location.href);
+      }
 			sendCanvasData();
 	  		intervalTime = 660000; // 11 Minuten.
 	  		clearInterval(a);
   			doImpfCheck();
   			a = window.setInterval(checkImpfReservTime, intervalTime); // Rufe nach intervalTime-Minute erneut diese Funktion auf.
-  		}
+  		}else{
+        errcounter=0; // Zeit läuft.
+      }
   	}, 7000); 
   }
 
