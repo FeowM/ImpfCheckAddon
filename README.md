@@ -24,12 +24,12 @@ Für iPhone (iOS): <a href="https://apps.apple.com/de/app/push-custom-notificati
 Die oben aufgeführten Apps sind lediglich eine Empfehlung. Ich übernehme keinerlei Verantwortung für die Nutzung und den evtl. entstandenen Schäden durch die oben erwähnten Apps. Es können gerne auch andere Apps verwendet werden. In der Regel sollten aber keine Probleme auftreten.
 
 # Installation / Einrichtung
-1. Die aktuelle Version des Firefox-Addons herunterladen (<a href="https://github.com/FeowM/ImpfCheckAddon/raw/main/firefoxRelease/impfcheck-1.5-fx.xpi">hier</a>)
+1. Die aktuelle Version des Firefox-Addons herunterladen (<a href="https://github.com/FeowM/ImpfCheckAddon/raw/main/firefoxRelease/impfcheck-1.5-fx.xpi" target="_blank">hier</a>)
 2. Eine der oben aufgeführten App auf dem Smartphone installieren
 3. Die App öffnen und die Einrichtung abschließen (Beim Programm für iOS kann eine Fake-Email-Adresse zur Registrierung angegeben werden). Bei Android die 3 Macros herunterladen (unten aufgelistet) und mit Macrodroid öffnen / installieren. Nähere Informationen zur Einrichtung folgen noch.
 4. Am Besten die URL's testweise im Webbrowser öffnen und prüfen, ob eine Benachrichtung auf dem Smartphone angezeigt wird.
 5. Die generierten URL's in der App kopieren und im ImpfCheck-Addon für Firefox unter dem Menüpunkt "Einstellungen" hinzufügen / speichern.
-6. Nun die Seite <a href="https://impfterminservice.de">impfterminservice.de</a> aufrufen.
+6. Nun die Seite <a href="https://impfterminservice.de" target="_blank">impfterminservice.de</a> aufrufen.
 7. Das Bundesland auswählen
 8. Das gewünschte Impfzentrum auswählen
 9. Auf "Zum Impfzentrum" klicken
