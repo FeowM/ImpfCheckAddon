@@ -20,6 +20,7 @@ var urlImpfAvail = "";
 var urlImpfError = "";
 var urlImpfAlive = "";
 var activeTabID = 0;
+var searchMode = 0;
 
 /**
  * Listen for clicks on the buttons, and send the appropriate message to
@@ -33,42 +34,51 @@ function listenForClicks() {
     function impfcheckStart(tabs) {
 
     	if(checkURLSet()==false){
-    		showMessage("Bitte zuerst die URLs in den Einstellungen festlegen.");
+    		showMessage("Bitte zuerst die URLs in den Einstellungen festlegen.", false);
     		return;
     	}
 
     	if(getActiveTabID()!=0){
-    		showMessage('Es läuft bereits ein Script. Bitte zuerst auf "Stop" klicken.');
+        if(getSearchMode()==0){showMessage('ImpfCheck-Suche läuft bereits. Bitte zuerst auf "Stop" klicken.', false); return;}
+        if(getSearchMode()==1){showMessage('Vermittlungscode-Suche läuft bereits. Bitte zuerst auf "Stop" klicken.', false); return;}
+        showMessage('Es läuft bereits ein Script. Bitte zuerst auf "Stop" klicken.', false);
     		return;
     	}
 
-      	browser.tabs.query({currentWindow: true, active: true}).then((tabs) => {
-          let tab = tabs[0];
-          if(tab.url==""){return;}
-          if(tab.url.includes("impfterminservice.de/impftermine")==false){showWrongSiteMessage(1); return;}else{
-          	if(tab.url.includes("impfterminservice.de/impftermine/service")==false && 
-          		tab.url.includes("impfterminservice.de/impftermine/suche")==false){showWrongSiteMessage(2); return;}else{
-          		if(tab.url.includes("impfterminservice.de/impftermine/service")==true){
-          			showWrongSiteMessage(3); return;
-          		}else {
-	          		if(tab.url.includes("impfterminservice.de/impftermine/suche")==true){
-	          			setActiveTabID(tabs[0].id);
-	          			browser.tabs.executeScript({file: "/content_scripts/impfcheck.js"})
-						.then(startImpfChecker)
-						.catch(reportExecuteScriptError);
-	          		}
-	          	}
+    	browser.tabs.query({currentWindow: true, active: true}).then((tabs) => {
+        let tab = tabs[0];
+        if(tab.url==""){return;}
+        if(tab.url.includes("impfterminservice.de/impftermine")==false){showWrongSiteMessage(1); return;}else{
+        	if(tab.url.includes("impfterminservice.de/impftermine/service")==false && 
+        		tab.url.includes("impfterminservice.de/impftermine/suche")==false){showWrongSiteMessage(2); return;}else{
+        		if(tab.url.includes("impfterminservice.de/impftermine/service")==true){
+        			showWrongSiteMessage(3); return;
+        		}else {
+          		if(tab.url.includes("impfterminservice.de/impftermine/suche")==true){
+          			setActiveTabID(tabs[0].id);
+          			browser.tabs.executeScript({file: "/content_scripts/impfcheck.js"})
+      					.then(startImpfChecker)
+      					.catch(reportExecuteScriptError);
+          		}
           	}
-          }
-      	}, console.error);
+        	}
+        }
+    	}, console.error);
+    }
+
+    function getActiveTabAndRun(functionname) {
+      browser.tabs.query({active: true, currentWindow: true})
+        .then(functionname)
+        .catch(reportError);
     }
 
     function startImpfChecker() {
-		updateWebHookURL();
-		browser.tabs.sendMessage(getActiveTabID(), {
-        	command: "impfCheckStart"
-      	});
-      	showMessage('Impfcheck gestartet. Nach ca. 11 Minuten wird das Script erneut auf den Button "Termine suchen" klicken. Sobald ein Termin verfügbar ist oder ein Fehler festgestellt wird, wird Sie das Addon über die zuvor in den Einstellungen gesetzten URLs benachrichtigen.');
+  		updateWebHookURL();
+  		browser.tabs.sendMessage(getActiveTabID(), {
+          	command: "impfCheckStart"
+      });
+      setSearchMode(0);
+      showMessage('Impfcheck gestartet. Nach ca. 11 Minuten wird das Script erneut auf den Button "Termine suchen" klicken. Sobald ein Termin verfügbar ist oder ein Fehler festgestellt wird, wird Sie das Addon über die zuvor in den Einstellungen gesetzten URLs benachrichtigen.', false);
     }
 
     function impfcheckStop(tabs) {
@@ -76,7 +86,31 @@ function listenForClicks() {
         command: "impfCheckStop"
       });
       resetActiveTabID();
-      showMessage('Impfcheck gestoppt.');
+      showMessage('Impfcheck gestoppt.', false);
+    }
+
+    function initStartCodeChecker(tabs) {
+      setActiveTabID(tabs[0].id);
+      browser.tabs.executeScript({file: "/content_scripts/impfcheck.js"})
+      .then(startCodeChecker)
+      .catch(reportExecuteScriptError);
+    }
+
+    function startCodeChecker() {
+      updateWebHookURL();
+      browser.tabs.sendMessage(getActiveTabID(), {
+            command: "codeCheckStart"
+      });
+      setSearchMode(1);
+      showMessage('Vermittlungscode-Suche gestartet. Nach ca. 5 Minuten wird das Script erneut auf den Button "Nein" klicken. Sobald ein Code gefunden wurde oder ein Fehler festgestellt wird, wird Sie das Addon über die zuvor in den Einstellungen gesetzten URLs benachrichtigen.', false);
+    }
+
+    function codeCheckStop(tabs) {
+      browser.tabs.sendMessage(getActiveTabID(), {
+        command: "codeCheckStop"
+      });
+      resetActiveTabID();
+      showMessage('Vermittlungscode-Suche gestoppt.', false);
     }
 
     function openSettings() {
@@ -88,9 +122,9 @@ function listenForClicks() {
     	openPage(2);
     }
 	
-	function openUpdateURL() {
-		openUpdateSite();
-	}
+  	function openUpdateURL() {
+  		openUpdateSite();
+  	}
 
     /**
      * Just log the error to the console.
@@ -110,7 +144,9 @@ function listenForClicks() {
       	}
 
       	if(mode==3){
-      		showMessage('Bitte geben Sie Ihren Vermittlungscode ein. Klicken Sie danach auf "Termin suchen". Sollten Sie noch keinen Vermittlungscode haben, müssen Sie diesen zuerst beantragen.', false);
+      		showMessage('Bitte geben Sie Ihren Vermittlungscode ein. Klicken Sie danach auf "Termin suchen". Sollten Sie noch keinen Vermittlungscode haben, klicken Sie bitte nachfolgend auf den Button.', true);
+          document.querySelector("#error-link").textContent="Vermittlungscode suchen";
+          document.querySelector("#error-link").onclick= function(event){getActiveTabAndRun(initStartCodeChecker);};
       	}
     }
 
@@ -171,7 +207,7 @@ function listenForClicks() {
     			if(urlImpfAvail!=""){if(urlImpfAvail.includes("http")==false){urlImpfAvail="http://"+urlImpfAvail;}}
     			if(urlImpfError!=""){if(urlImpfError.includes("http")==false){urlImpfError="http://"+urlImpfError;}}
     			if(urlImpfAlive!=""){if(urlImpfAlive.includes("http")==false){urlImpfAlive="http://"+urlImpfAlive;}}
-    			updateFirefoxSettings(urlImpfAvail, urlImpfError, urlImpfAlive, "");
+    			updateFirefoxSettings(urlImpfAvail, urlImpfError, urlImpfAlive, "", "");
     			updateWebHookURL();
     			openPage(1);
     		break;
@@ -202,14 +238,15 @@ function listenForClicks() {
      * then call "impfcheckStart()" or "impfcheckStop()" as appropriate.
      */
     if (e.target.classList.contains("start")) {
-      browser.tabs.query({active: true, currentWindow: true})
-        .then(impfcheckStart)
-        .catch(reportError);
+      getActiveTabAndRun(impfcheckStart);
     }
     else if (e.target.classList.contains("stop")) {
-      browser.tabs.query({active: true, currentWindow: true})
-        .then(impfcheckStop)
-        .catch(reportError);
+      if(getSearchMode()==0){
+        getActiveTabAndRun(impfcheckStop);
+      }
+      if(getSearchMode()==1){
+        getActiveTabAndRun(codeCheckStop);
+      }
     }
     else if (e.target.classList.contains("settings")) {
       openSettings();
@@ -223,7 +260,7 @@ function listenForClicks() {
     else if (e.target.classList.contains("dosave")) {
       saveSettings();
     }
-	else if (e.target.classList.contains("update")) {
+  	else if (e.target.classList.contains("update")) {
       openUpdateURL();
     }
   });
@@ -265,16 +302,18 @@ function updateWebHookURL()
 	});
 }
 
-function updateFirefoxSettings(tmpUrlImpfAvail="", tempUrlImpfError="", tmpUrlImpfAlive="", tmpActiveTabID="") {
+function updateFirefoxSettings(tmpUrlImpfAvail="", tempUrlImpfError="", tmpUrlImpfAlive="", tmpActiveTabID="", tmpSearchMode="") {
 	if(tmpUrlImpfAvail==""){tmpUrlImpfAvail=urlImpfAvail;}
 	if(tempUrlImpfError==""){tempUrlImpfError=urlImpfError;}
 	if(tmpUrlImpfAlive==""){tmpUrlImpfAlive=urlImpfAlive;}
 	if(tmpActiveTabID==""){tmpActiveTabID=activeTabID;}
+  if(tmpSearchMode==""){tmpSearchMode=searchMode;}
 	browser.storage.sync.set({
 	    urlImpfAvail: tmpUrlImpfAvail,
 	    urlImpfError: tempUrlImpfError,
 	    urlImpfAlive: tmpUrlImpfAlive,
-	    activeTabID: tmpActiveTabID
+	    activeTabID: tmpActiveTabID,
+      searchMode: tmpSearchMode
 	});
 }
 
@@ -288,14 +327,14 @@ function onImpfTerminSiteError(error) {
 
 function restoreOptions() {
 
-  function setWebHookURLs(result) {
-  	console.log("Get URLs");
+  function initSettings(result) {
   	if(result==null || result.urlImpfAvail==null || result.urlImpfError==null || result.urlImpfAlive==null){return;}
-  	if(result==undefined || result.urlImpfAvail==undefined || result.urlImpfError==undefined || result.urlImpfAlive==undefined || result.activeTabID==undefined){return;}
+  	if(result==undefined || result.urlImpfAvail==undefined || result.urlImpfError==undefined || result.urlImpfAlive==undefined || result.activeTabID==undefined || result.searchMode==undefined){return;}
   	urlImpfAvail = result.urlImpfAvail;
   	urlImpfError = result.urlImpfError;
   	urlImpfAlive = result.urlImpfAlive;
   	activeTabID = result.activeTabID;
+    searchMode = result.searchMode;
   	updateWebHookURL();
   }
 
@@ -303,8 +342,8 @@ function restoreOptions() {
     console.log(`Error: ${error}`);
   }
 
-  let getting = browser.storage.sync.get(["urlImpfAvail", "urlImpfError", "urlImpfAlive", "activeTabID"]);
-  getting.then(setWebHookURLs, onError);
+  let getting = browser.storage.sync.get(["urlImpfAvail", "urlImpfError", "urlImpfAlive", "activeTabID", "searchMode"]);
+  getting.then(initSettings, onError);
 }
 
 function resetActiveTabID()
@@ -314,19 +353,27 @@ function resetActiveTabID()
 
 function setActiveTabID(id) {
 	activeTabID=id;
-	updateFirefoxSettings("", "", "", activeTabID);
+	updateFirefoxSettings("", "", "", activeTabID, "");
 }
 
 function getActiveTabID() {
-	console.log(activeTabID);
-	return activeTabID;
+  return activeTabID;
+}
+
+function setSearchMode(mode) {
+  searchMode=mode;
+  updateFirefoxSettings("", "", "", "", searchMode);
+}
+
+function getSearchMode() {
+  return searchMode;
 }
 
 listenForClicks();
 
 document.addEventListener("DOMContentLoaded", restoreOptions);
 
-
+/* Deprecated:
 function handleMessage(request, sender, sendResponse) {
 	console.log("Nachricht eingegangen.");
   	console.log(request);
@@ -341,6 +388,7 @@ function handleMessage(request, sender, sendResponse) {
   //sendResponse({response: "Response from background script"});
 }
 
+
 function onWebHookCreated(tab) {
 	setTimeout(function(){
 	  browser.tabs.remove(tab.id);
@@ -351,5 +399,6 @@ function onWebHookError(error) {
 	console.log(`Error: ${error}`);
 }
 
-browser.runtime.onMessage.addListener(handleMessage);
 
+browser.runtime.onMessage.addListener(handleMessage);
+*/

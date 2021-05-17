@@ -35,20 +35,24 @@
   var urlImpfAlive = "";
   var activeTabID = 0;
   var timercounter = 11;
-  var intervalTime = 660000; // 11 Minuten.
+  var intervalTimeImpfCheck = 660000; // 11 Minuten.
+  var intervalTimeCodeCheck = 300000; // 5 Minuten.
   var errcounter = 0;
 
-  function injectScript() {
-    showScriptInjected();
-    var searchBtn = document.getElementsByClassName("btn btn-magenta kv-btn kv-btn-round search-filter-button");
-    if(searchBtn.length>0){ if(searchBtn[0]!= null){
-      searchBtn[0].click();
-      setTimeout(function(){
-        checkImpfAvailable();
-      }, 5000); // 5 Sekunden warten.
-    }}
+  function injectCodeCheckScript() {
+    showCodeCheckScriptInjected();
+    var radioBtns = document.getElementsByClassName("ets-radio-control");
+    if(radioBtns.length>1){ if(radioBtns[1]!= null){
+      var noBtn = radioBtns[1].getElementsByTagName("span");
+      if(noBtn.length>0){ if(noBtn[0]!= null){
+        noBtn[0].click(); // Klicke auf "Nein"
+        setTimeout(function(){
+          checkCodeAvailable();
+        }, 10000); // 10 Sekunden warten.
+      }}
+    }}s
 
-    a = window.setInterval(checkImpfReservTime, intervalTime);
+    a = window.setInterval(injectCodeCheckScript, intervalTimeCodeCheck); // Nach 5 Minuten erneut klicken.
 
     if(urlImpfAlive!=null && urlImpfAlive!="") {
       // Lebenszeichen:
@@ -58,46 +62,56 @@
     }
   }
 
-  /*
-  b = window.setInterval(doCountTimer, 60000); // Jede Minute.
+  function injectImpfCheckScript() {
+    showImpfCheckScriptInjected();
+    var searchBtn = document.getElementsByClassName("btn btn-magenta kv-btn kv-btn-round search-filter-button");
+    if(searchBtn.length>0){ if(searchBtn[0]!= null){
+      searchBtn[0].click();
+      setTimeout(function(){
+        checkImpfAvailable();
+      }, 5000); // 5 Sekunden warten.
+    }}
 
-  function doCountTimer() {
-  	timercounter--;
+    a = window.setInterval(checkImpfReservTime, intervalTimeImpfCheck);
+
+    if(urlImpfAlive!=null && urlImpfAlive!="") {
+      // Lebenszeichen:
+      z = window.setInterval(function () {
+        sendWebHook(urlImpfAlive);
+      }, 21600000); // 6 Stunden warten.
+    }
   }
-  */
 
   function checkImpfReservTime()
   {
   	if(checkReservFinished()==true){ // Wenn Zeit abgelaufen:
-  		intervalTime = 660000; // 11 Minuten.
-		doImpfCheck();
-	}else{ // Wenn Zeit nicht abgelaufen:
-		intervalTime = 60000; // Jede Minute.
-	}  
-	clearInterval(a);
-	a = window.setInterval(checkImpfReservTime, intervalTime); // Rufe nach intervalTime-Minute erneut diese Funktion auf.
+    	intervalTimeImpfCheck = 660000; // 11 Minuten.
+  		doImpfCheck();
+  	}else{ // Wenn Zeit nicht abgelaufen:
+  		intervalTimeImpfCheck = 60000; // Jede Minute.
+  	}  
+  	clearInterval(a);
+  	a = window.setInterval(checkImpfReservTime, intervalTimeImpfCheck); // Rufe nach intervalTimeImpfCheck-Minute erneut diese Funktion auf.
   }
 
   function checkReservFinished(){
   	var counterElem = document.getElementsByTagName("strong");
-	var foundCounterText = "";
-	for(var i=0;i<counterElem.length;i++){
-    	if(counterElem[i].innerHTML.includes('min ')){
-			foundCounterText = counterElem[i].innerHTML;
-			break;
-		}
-	}
-	if(foundCounterText=="" || foundCounterText!="00min 00s"){
-		return false;
-	}
-	return true;
+  	var foundCounterText = "";
+  	for(var i=0;i<counterElem.length;i++){
+      	if(counterElem[i].innerHTML.includes('min ')){
+  			foundCounterText = counterElem[i].innerHTML;
+  			break;
+  		}
+  	}
+  	if(foundCounterText=="" || foundCounterText!="00min 00s"){
+  		return false;
+  	}
+  	return true;
   }
 
   function doImpfCheck()
   {
 	  timercounter=11;
-	  //clearInterval(b);
-	  //b = window.setInterval(doCountTimer, 60000); // Restart.
 	  var done = false;
 	  var o = document.getElementsByClassName("its-search-step-info");
 	  if(o.length>0){ if(o[0]!= null){
@@ -115,7 +129,7 @@
 	    if(done==false){
 	      // Etwas stimmt nicht oder es gibt Termine:
 	      sendWebHook(urlImpfError);
-	      removeScript();
+	      removeImpfCheckScript();
 	    }
 	    done=false;
 	  }, 40000); // 40 Sekunden warten.
@@ -167,10 +181,10 @@
         sendWebHook(window.location.href);
       }
 			sendCanvasData();
-	  		intervalTime = 660000; // 11 Minuten.
+	  		intervalTimeImpfCheck = 660000; // 11 Minuten.
 	  		clearInterval(a);
   			doImpfCheck();
-  			a = window.setInterval(checkImpfReservTime, intervalTime); // Rufe nach intervalTime-Minute erneut diese Funktion auf.
+  			a = window.setInterval(checkImpfReservTime, intervalTimeImpfCheck); // Rufe nach intervalTimeImpfCheck-Minute erneut diese Funktion auf.
   		}else{
         errcounter=0; // Zeit läuft.
       }
@@ -179,39 +193,63 @@
 
   function impfIsAvailable() {
     sendWebHook(urlImpfAvail);
-    removeScript();
+    removeImpfCheckScript();
   }
 
-  function removeScript() {
+  function removeImpfCheckScript() {
     if(a!=null){clearInterval(a);}
     //if(b!=null){clearInterval(b);}
     if(c!=null){clearInterval(c);}
     if(z!=null){clearInterval(z);}
-    showScriptRemoved();
+    showImpfCheckScriptRemoved();
+  }
+
+  function checkCodeAvailable() {
+    var h = document.getElementsByClassName("alert alert-danger text-center");
+    if(h.length>0){ if(h[0]!= null){
+      if(h[0].innerHTML.includes("keine freien Termine"))
+      {
+        return false;
+      }else{
+        // Nochmalige Pruefung, zur Sicherheit:
+        var bodystring = document.documentElement.innerHTML;
+        if(bodystring.includes("keine freien Termine")==true){
+          return false;
+        }else{
+          codeIsAvailable();
+        }
+      }
+    }}
+
+    // Sollte Meldung nicht kommen, ist ein Code verfuegbar oder es gab einen Fehler:
+    codeIsAvailable();
+  }
+
+  function codeIsAvailable() {
+    sendWebHook(urlImpfAvail);
+    removeImpfCheckScript();
+  }
+
+  function removeCodeCheckScript() {
+    if(a!=null){clearInterval(a);}
+    if(z!=null){clearInterval(z);}
+    showCodeCheckScriptRemoved();
   }
 
   function sendWebHook(hookurl) {
-	let xhr = new XMLHttpRequest();
-	xhr.onload = function () {
-		console.log("done");
-	};
+  	let xhr = new XMLHttpRequest();
+  	xhr.onload = function () {
+  		console.log("done");
+  	};
 
-	xhr.onerror = function (e) {
-		console.log('An error occurred');
-		console.log(e);
-	}
-	xhr.open('GET', hookurl, true);
-	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	xhr.send();
+  	xhr.onerror = function (e) {
+  		console.log('An error occurred');
+  		console.log(e);
+  	}
+  	xhr.open('GET', hookurl, true);
+  	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  	xhr.send();
   	return;
-  	/*
-    var sending = browser.runtime.sendMessage({
-      command: "openTab",
-      param1: hookurl,
-      param2: "autoclose"
-    });
-    sending();
-    */
   }
 
   var simulateClick = function (elem) {
@@ -224,10 +262,10 @@
   };
   
   function sendCanvasData() {
-	var z = document.getElementsByClassName("app-wrapper");
-	if(z==null){return;}
-	if(z.length==0){return;}
-	z[0].dispatchEvent(new Event('mousedown'));
+  	var z1 = document.getElementsByClassName("app-wrapper");
+  	if(z1==null){return;}
+  	if(z1.length==0){return;}
+  	z1[0].dispatchEvent(new Event('mousedown'));
   }
 
   /**
@@ -235,9 +273,13 @@
   */
   browser.runtime.onMessage.addListener((message) => {
     if (message.command === "impfCheckStart") {
-      injectScript();
+      injectImpfCheckScript();
     } else if (message.command === "impfCheckStop") {
-      removeScript();
+      removeImpfCheckScript();
+    } else if (message.command === "codeCheckStart") {
+      injectCodeCheckScript();
+    } else if (message.command === "codeCheckStop") {
+      removeCodeCheckScript();
     } else if (message.command === "updateURL") {
       urlImpfAvail = message.param1;
       urlImpfError = message.param2;
@@ -255,12 +297,20 @@
     showHTMLMessage('Bitte wählen Sie zuerst Ihr Bundesland und Ihr Impfzentrum aus und klicken Sie dann auf "Zum Impfzentrum".');
   }
 
-  function showScriptInjected() {
+  function showImpfCheckScriptInjected() {
     showHTMLMessage('ImpfCheck-Script gestartet. Nach ca. 11 Minuten wird das Script automatisch auf den Button "Termine suchen" erneut klicken.');
   }
 
-  function showScriptRemoved() {
+  function showImpfCheckScriptRemoved() {
     showHTMLMessage('ImpfCheck-Script gestoppt.')
+  }
+
+  function showCodeCheckScriptInjected() {
+    showHTMLMessage('CodeCheck-Script gestartet. Nach ca. 5 Minuten wird das Script automatisch auf den Button "Nein" erneut klicken.');
+  }
+
+  function showCodeCheckScriptRemoved() {
+    showHTMLMessage('CodeCheck-Script gestoppt.')
   }
 
   function showHTMLMessage(message) {
