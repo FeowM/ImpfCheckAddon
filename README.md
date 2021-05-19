@@ -47,7 +47,7 @@ Bitte mit "Rechtsklick -> Ziel speichern unter" auf dem Endgerät (Android) absp
   <li>Macro für Impfung verfügbar - Benachrichtigung: <a href="https://github.com/FeowM/ImpfCheckAddon/raw/main/macrodroid_macros/ImpfAvail.macro">Download</a></li>
   <li>Macro für Impfung Fehlgeschlagen - Benachrichtigung: <a href="https://github.com/FeowM/ImpfCheckAddon/raw/main/macrodroid_macros/ImpfError.macro">Download</a></li>
   <li>Macro für Impfung Lebenszeichen - Benachrichtigung: <a href="https://github.com/FeowM/ImpfCheckAddon/raw/main/macrodroid_macros/ImpfAlive.macro">Download</a></li>
-  <li>Macro für Vermittlungscode verfügbar - Benachrichtigung: <a href="https://github.com/FeowM/ImpfCheckAddon/blob/main/macrodroid_macros/CodeAvail.macro">Download</a></li>
+  <li>Macro für Vermittlungscode verfügbar - Benachrichtigung: <a href="https://raw.githubusercontent.com/FeowM/ImpfCheckAddon/main/macrodroid_macros/CodeAvail.macro">Download</a></li>
   
 </ul>
 
