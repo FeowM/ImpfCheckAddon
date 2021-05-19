@@ -63,7 +63,7 @@
             sendCanvasData();
             a = window.setInterval(doCheckCode, intervalTimeCodeCheck); // Nach 5 Minuten erneut klicken.
           }
-        }, 10000); // 10 Sekunden warten.
+        }, 15000); // 15 Sekunden warten.
       }}
     }}
   }
