@@ -19,6 +19,7 @@
 var urlImpfAvail = "";
 var urlImpfError = "";
 var urlImpfAlive = "";
+var urlCodeAvail = "";
 var activeTabID = 0;
 var searchMode = 0;
 
@@ -33,7 +34,7 @@ function listenForClicks() {
 
     function impfcheckStart(tabs) {
 
-    	if(checkURLSet()==false){
+    	if(checkURLSet(1)==false){
     		showMessage("Bitte zuerst die URLs in den Einstellungen festlegen.", false);
     		return;
     	}
@@ -90,6 +91,11 @@ function listenForClicks() {
     }
 
     function initStartCodeChecker(tabs) {
+      if(checkURLSet(2)==false){
+        showMessage("Bitte zuerst die URL für die Vermittlungscode-Benachrichtigung in den Einstellungen festlegen.", false);
+        return;
+      }
+
       setActiveTabID(tabs[0].id);
       browser.tabs.executeScript({file: "/content_scripts/impfcheck.js"})
       .then(startCodeChecker)
@@ -102,7 +108,7 @@ function listenForClicks() {
             command: "codeCheckStart"
       });
       setSearchMode(1);
-      showMessage('Vermittlungscode-Suche gestartet. Nach ca. 5 Minuten wird das Script erneut auf den Button "Nein" klicken. Sobald ein Code gefunden wurde oder ein Fehler festgestellt wird, wird Sie das Addon über die zuvor in den Einstellungen gesetzten URLs benachrichtigen.', false);
+      showMessage('Vermittlungscode-Suche gestartet. Nach ca. 7 Minuten wird das Script erneut auf den Button "Nein" klicken. Sobald ein Code gefunden wurde oder ein Fehler festgestellt wird, wird Sie das Addon über die zuvor in den Einstellungen gesetzten URLs benachrichtigen.', false);
     }
 
     function codeCheckStop(tabs) {
@@ -203,11 +209,13 @@ function listenForClicks() {
     			urlImpfAvail = document.getElementById("impfavail").value;
     			urlImpfError = document.getElementById("impferror").value;
     			urlImpfAlive = document.getElementById("impfalive").value;
+          urlCodeAvail = document.getElementById("codeavail").value;
 
     			if(urlImpfAvail!=""){if(urlImpfAvail.includes("http")==false){urlImpfAvail="http://"+urlImpfAvail;}}
     			if(urlImpfError!=""){if(urlImpfError.includes("http")==false){urlImpfError="http://"+urlImpfError;}}
     			if(urlImpfAlive!=""){if(urlImpfAlive.includes("http")==false){urlImpfAlive="http://"+urlImpfAlive;}}
-    			updateFirefoxSettings(urlImpfAvail, urlImpfError, urlImpfAlive, "", "");
+          if(urlCodeAvail!=""){if(urlCodeAvail.includes("http")==false){urlCodeAvail="http://"+urlCodeAvail;}}
+    			updateFirefoxSettings(urlImpfAvail, urlImpfError, urlImpfAlive, urlCodeAvail, "", "");
     			updateWebHookURL();
     			openPage(1);
     		break;
@@ -222,14 +230,20 @@ function listenForClicks() {
     			document.getElementById("impfavail").value = urlImpfAvail;
     			document.getElementById("impferror").value = urlImpfError;
     			document.getElementById("impfalive").value = urlImpfAlive;
+          document.getElementById("codeavail").value = urlCodeAvail
     		break;
 
     		default:break;
     	}
     }
 
-    function checkURLSet() {
-    	if(urlImpfAvail=="" || urlImpfError==""){return false;}
+    function checkURLSet(mode) {
+      if(mode==1){
+        if(urlImpfAvail=="" || urlImpfError==""){return false;}
+      }
+      if(mode==2){
+        if(urlCodeAvail=="" || urlImpfError==""){return false;}
+      }
     	return true;
     }
 
@@ -298,20 +312,23 @@ function updateWebHookURL()
 	    param1: urlImpfAvail,
 	    param2: urlImpfError,
 	    param3: urlImpfAlive,
-	    param4: activeTabID
+      param4: urlCodeAvail,
+	    param5: activeTabID
 	});
 }
 
-function updateFirefoxSettings(tmpUrlImpfAvail="", tempUrlImpfError="", tmpUrlImpfAlive="", tmpActiveTabID="", tmpSearchMode="") {
+function updateFirefoxSettings(tmpUrlImpfAvail="", tempUrlImpfError="", tmpUrlImpfAlive="", tmpUrlCodeAvail="", tmpActiveTabID="", tmpSearchMode="") {
 	if(tmpUrlImpfAvail==""){tmpUrlImpfAvail=urlImpfAvail;}
 	if(tempUrlImpfError==""){tempUrlImpfError=urlImpfError;}
 	if(tmpUrlImpfAlive==""){tmpUrlImpfAlive=urlImpfAlive;}
+  if(tmpUrlCodeAvail==""){tmpUrlCodeAvail=urlCodeAvail;}
 	if(tmpActiveTabID==""){tmpActiveTabID=activeTabID;}
   if(tmpSearchMode==""){tmpSearchMode=searchMode;}
 	browser.storage.sync.set({
 	    urlImpfAvail: tmpUrlImpfAvail,
 	    urlImpfError: tempUrlImpfError,
 	    urlImpfAlive: tmpUrlImpfAlive,
+      urlCodeAvail: tmpUrlCodeAvail,
 	    activeTabID: tmpActiveTabID,
       searchMode: tmpSearchMode
 	});
@@ -328,11 +345,12 @@ function onImpfTerminSiteError(error) {
 function restoreOptions() {
 
   function initSettings(result) {
-  	if(result==null || result.urlImpfAvail==null || result.urlImpfError==null || result.urlImpfAlive==null){return;}
-  	if(result==undefined || result.urlImpfAvail==undefined || result.urlImpfError==undefined || result.urlImpfAlive==undefined || result.activeTabID==undefined || result.searchMode==undefined){return;}
+  	if(result==null || result.urlImpfAvail==null || result.urlImpfError==null || result.urlImpfAlive==null || result.urlCodeAvail==null){return;}
+  	if(result==undefined || result.urlImpfAvail==undefined || result.urlImpfError==undefined || result.urlImpfAlive==undefined || result.urlCodeAvail==undefined || result.activeTabID==undefined || result.searchMode==undefined){return;}
   	urlImpfAvail = result.urlImpfAvail;
   	urlImpfError = result.urlImpfError;
   	urlImpfAlive = result.urlImpfAlive;
+    urlCodeAvail = result.urlCodeAvail;
   	activeTabID = result.activeTabID;
     searchMode = result.searchMode;
   	updateWebHookURL();
@@ -342,7 +360,7 @@ function restoreOptions() {
     console.log(`Error: ${error}`);
   }
 
-  let getting = browser.storage.sync.get(["urlImpfAvail", "urlImpfError", "urlImpfAlive", "activeTabID", "searchMode"]);
+  let getting = browser.storage.sync.get(["urlImpfAvail", "urlImpfError", "urlImpfAlive", "urlCodeAvail", "activeTabID", "searchMode"]);
   getting.then(initSettings, onError);
 }
 
@@ -353,7 +371,7 @@ function resetActiveTabID()
 
 function setActiveTabID(id) {
 	activeTabID=id;
-	updateFirefoxSettings("", "", "", activeTabID, "");
+	updateFirefoxSettings("", "", "", "", activeTabID, "");
 }
 
 function getActiveTabID() {
@@ -362,7 +380,7 @@ function getActiveTabID() {
 
 function setSearchMode(mode) {
   searchMode=mode;
-  updateFirefoxSettings("", "", "", "", searchMode);
+  updateFirefoxSettings("", "", "", "", "", searchMode);
 }
 
 function getSearchMode() {

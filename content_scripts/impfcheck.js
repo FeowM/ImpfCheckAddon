@@ -33,26 +33,16 @@
   var urlImpfAvail = "";
   var urlImpfError = "";
   var urlImpfAlive = "";
+  var urlCodeAvail = ""; 
   var activeTabID = 0;
   var timercounter = 11;
   var intervalTimeImpfCheck = 660000; // 11 Minuten.
-  var intervalTimeCodeCheck = 300000; // 5 Minuten.
+  var intervalTimeCodeCheck = 420000; // 7 Minuten.
   var errcounter = 0;
 
   function injectCodeCheckScript() {
     showCodeCheckScriptInjected();
-    var radioBtns = document.getElementsByClassName("ets-radio-control");
-    if(radioBtns.length>1){ if(radioBtns[1]!= null){
-      var noBtn = radioBtns[1].getElementsByTagName("span");
-      if(noBtn.length>0){ if(noBtn[0]!= null){
-        noBtn[0].click(); // Klicke auf "Nein"
-        setTimeout(function(){
-          checkCodeAvailable();
-        }, 10000); // 10 Sekunden warten.
-      }}
-    }}s
-
-    a = window.setInterval(injectCodeCheckScript, intervalTimeCodeCheck); // Nach 5 Minuten erneut klicken.
+    doCheckCode();
 
     if(urlImpfAlive!=null && urlImpfAlive!="") {
       // Lebenszeichen:
@@ -60,6 +50,22 @@
         sendWebHook(urlImpfAlive);
       }, 21600000); // 6 Stunden warten.
     }
+  }
+
+  function doCheckCode() {
+    var radioBtns = document.getElementsByClassName("ets-radio-control");
+    if(radioBtns.length>1){ if(radioBtns[1]!= null){
+      var noBtn = radioBtns[1].getElementsByTagName("span");
+      if(noBtn.length>0){ if(noBtn[0]!= null){
+        noBtn[0].click(); // Klicke auf "Nein"
+        setTimeout(function(){
+          if(checkCodeAvailable()==false){ // Wenn kein Code verfuegbar:
+            sendCanvasData();
+            a = window.setInterval(doCheckCode, intervalTimeCodeCheck); // Nach 5 Minuten erneut klicken.
+          }
+        }, 10000); // 10 Sekunden warten.
+      }}
+    }}
   }
 
   function injectImpfCheckScript() {
@@ -173,14 +179,14 @@
     // Nach 7 Sekunden erneut pruefen, ob die Zeit nun wieder von vorne beginnt. Wenn nicht, dann nochmal Link anklicken:
     setTimeout(function(){
 	    if(checkReservFinished()==true){ // Wenn Zeit abgelaufen:
-      errcounter++;
-      if(errcounter>2){ // Wenn Zeit nach dem 3. Versuch immernoch nicht startet:
-        errcounter=0;
-        // Rufe die derzeitige URL noch einmal auf (AJAX):
-        console.log("Reopen site with AJAX.");
-        sendWebHook(window.location.href);
-      }
-			sendCanvasData();
+        errcounter++;
+        if(errcounter>2){ // Wenn Zeit nach dem 3. Versuch immernoch nicht startet:
+          errcounter=0;
+          // Rufe die derzeitige URL noch einmal auf (AJAX):
+          console.log("Reopen site with AJAX.");
+          sendWebHook(window.location.href);
+        }
+  			sendCanvasData();
 	  		intervalTimeImpfCheck = 660000; // 11 Minuten.
 	  		clearInterval(a);
   			doImpfCheck();
@@ -226,8 +232,8 @@
   }
 
   function codeIsAvailable() {
-    sendWebHook(urlImpfAvail);
-    removeImpfCheckScript();
+    sendWebHook(urlCodeAvail);
+    removeCodeCheckScript();
   }
 
   function removeCodeCheckScript() {
@@ -284,7 +290,8 @@
       urlImpfAvail = message.param1;
       urlImpfError = message.param2;
       urlImpfAlive = message.param3;
-      activeTabID  = message.param4;
+      urlCodeAvail = message.param4;
+      activeTabID  = message.param5;
     }
   });
 
@@ -306,7 +313,7 @@
   }
 
   function showCodeCheckScriptInjected() {
-    showHTMLMessage('CodeCheck-Script gestartet. Nach ca. 5 Minuten wird das Script automatisch auf den Button "Nein" erneut klicken.');
+    showHTMLMessage('CodeCheck-Script gestartet. Nach ca. 7 Minuten wird das Script automatisch auf den Button "Nein" erneut klicken.');
   }
 
   function showCodeCheckScriptRemoved() {
