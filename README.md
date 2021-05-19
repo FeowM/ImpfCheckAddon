@@ -9,7 +9,7 @@ Ist ein Impftermin verfügbar, wird die zuvor in den Einstellungen festgelegte U
 <b>Das Addon bucht keine Termine selbstständig! Es benachrichtigt lediglich den Benutzer, dass ein Impftermin für Ihn für 10 Minuten reserviert wurde.</b>
 
 # Voraussetzungen
-1. Einen Vermittlungscode
+1. Einen Vermittlungscode (bald keine Voraussetzung mehr)
 2. Ein Smartphone (Android oder iOS) mit entsprechender App (nachfolgend beschrieben)
 
 Hinweis: Das Addon wird zukünftig noch erweitert, damit auch ein Vermittlungscode vollständig automatisch erworben werden kann. Dies dauert aber noch etwas.
@@ -47,7 +47,9 @@ Bitte mit "Rechtsklick -> Ziel speichern unter" auf dem Endgerät (Android) absp
   <li>Macro für Impfung verfügbar - Benachrichtigung: <a href="https://github.com/FeowM/ImpfCheckAddon/raw/main/macrodroid_macros/ImpfAvail.macro">Download</a></li>
   <li>Macro für Impfung Fehlgeschlagen - Benachrichtigung: <a href="https://github.com/FeowM/ImpfCheckAddon/raw/main/macrodroid_macros/ImpfError.macro">Download</a></li>
   <li>Macro für Impfung Lebenszeichen - Benachrichtigung: <a href="https://github.com/FeowM/ImpfCheckAddon/raw/main/macrodroid_macros/ImpfAlive.macro">Download</a></li>
+  <li>Macro für Vermittlungscode verfügbar - Benachrichtigung: <a href="https://github.com/FeowM/ImpfCheckAddon/blob/main/macrodroid_macros/CodeAvail.macro">Download</a></li>
+  
 </ul>
 
 Ich hoffe ich konnte durch dieses Addon dem ein oder anderen etwas helfen.
-Bitte entschuldigt den etwas schlampig programmierten Code. Das ist mein erstes Firefox-Addon und ich wollte es einfach so schnell wie möglich veröffentlichen.
+Bitte entschuldigt den etwas unsauber programmierten Code. Das ist mein erstes Firefox-Addon und ich wollte es einfach so schnell wie möglich veröffentlichen.
