@@ -43,6 +43,7 @@
   function injectCodeCheckScript() {
     showCodeCheckScriptInjected();
     doCheckCode();
+    a = window.setInterval(doCheckCode, intervalTimeCodeCheck); // Nach 5 Minuten erneut klicken.
 
     if(urlImpfAlive!=null && urlImpfAlive!="") {
       // Lebenszeichen:
@@ -61,7 +62,6 @@
         setTimeout(function(){
           if(checkCodeAvailable()==false){ // Wenn kein Code verfuegbar:
             sendCanvasData();
-            a = window.setInterval(doCheckCode, intervalTimeCodeCheck); // Nach 5 Minuten erneut klicken.
           }
         }, 15000); // 15 Sekunden warten.
       }}
