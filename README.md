@@ -8,9 +8,11 @@ Ist ein Impftermin verfügbar, wird die zuvor in den Einstellungen festgelegte U
 
 <b>Das Addon bucht keine Termine selbstständig! Es benachrichtigt lediglich den Benutzer, dass ein Impftermin für Ihn für 10 Minuten reserviert wurde.</b>
 
+#NEU
+Vermittlungscode kann nun ebenfalls über das Addon automatisiert gesucht werden!
+
 # Voraussetzungen
-1. Einen Vermittlungscode (bald keine Voraussetzung mehr)
-2. Ein Smartphone (Android oder iOS) mit entsprechender App (nachfolgend beschrieben)
+1. Ein Smartphone (Android oder iOS) mit entsprechender App (nachfolgend beschrieben)
 
 Hinweis: Das Addon wird zukünftig noch erweitert, damit auch ein Vermittlungscode vollständig automatisch erworben werden kann. Dies dauert aber noch etwas.
 
@@ -33,10 +35,13 @@ Die oben aufgeführten Apps sind lediglich eine Empfehlung. Ich übernehme keine
 7. Das Bundesland auswählen
 8. Das gewünschte Impfzentrum auswählen
 9. Auf "Zum Impfzentrum" klicken
-10. Vermittlungscode eingeben (muss bereits vorhanden sein, wenn nicht, einen anfordern)
+10. Vermittlungscode eingeben (sofern vorhanden, ansonsten Schritt 10.2 ausführen)
 11. Auf "Termin suchen" klicken
 12. ImpfCheck-Addon öffnen und auf die Schaltfläche "Start" klicken. Es sollte sich ein Fenster öffnen auf der Website.
 13. Warten. Sobald ein Termin verfügbar ist, kommt eine Benachrichtigung auf das Smartphone.
+
+10.2 Noch keinen Vermittlungscode? Dann auf "Vermittlungscode suchen" im Addon klicken.
+11.2 Warten. Sobald ein Vermittlungscode verfügbar ist, kommt eine Benachrichtigung auf das Smartphone.
 
 
 # Macro-Vorlagen für Macrodroid
