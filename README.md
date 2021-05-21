@@ -8,7 +8,7 @@ Ist ein Impftermin verfügbar, wird die zuvor in den Einstellungen festgelegte U
 
 <b>Das Addon bucht keine Termine selbstständig! Es benachrichtigt lediglich den Benutzer, dass ein Impftermin für Ihn für 10 Minuten reserviert wurde.</b>
 
-#NEU
+# NEU
 Vermittlungscode kann nun ebenfalls über das Addon automatisiert gesucht werden!
 
 # Voraussetzungen
