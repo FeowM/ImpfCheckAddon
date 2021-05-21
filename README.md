@@ -39,6 +39,7 @@ Die oben aufgeführten Apps sind lediglich eine Empfehlung. Ich übernehme keine
 13. Warten. Sobald ein Termin verfügbar ist, kommt eine Benachrichtigung auf das Smartphone.
 
 10.2 Noch keinen Vermittlungscode? Dann auf "Vermittlungscode suchen" im Addon klicken.
+
 11.2 Warten. Sobald ein Vermittlungscode verfügbar ist, kommt eine Benachrichtigung auf das Smartphone.
 
 
