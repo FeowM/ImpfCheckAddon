@@ -277,6 +277,9 @@ function listenForClicks() {
   	else if (e.target.classList.contains("update")) {
       openUpdateURL();
     }
+    else if (e.target.classList.contains("spenden")) {
+      openSpendeURL();
+    }
   });
 }
 
@@ -300,6 +303,13 @@ function openImpfTerminSite() {
 function openUpdateSite() {
   var creating = browser.tabs.create({
     url:"https://github.com/FeowM/ImpfCheckAddon/tree/main/firefoxRelease"
+  });
+  creating.then(onImpfTerminSiteCreated, onImpfTerminSiteError);
+}
+
+function openSpendeURL() {
+  var creating = browser.tabs.create({
+    url:"https://www.paypal.com/donate/?hosted_button_id=LSMGFDBPQZ3VY"
   });
   creating.then(onImpfTerminSiteCreated, onImpfTerminSiteError);
 }
