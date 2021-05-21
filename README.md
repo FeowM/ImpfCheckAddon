@@ -14,8 +14,6 @@ Vermittlungscode kann nun ebenfalls über das Addon automatisiert gesucht werden
 # Voraussetzungen
 1. Ein Smartphone (Android oder iOS) mit entsprechender App (nachfolgend beschrieben)
 
-Hinweis: Das Addon wird zukünftig noch erweitert, damit auch ein Vermittlungscode vollständig automatisch erworben werden kann. Dies dauert aber noch etwas.
-
 # App für die Benachrichtigung auf dem Smartphone
 Um sogenannte WebHook-URLs zu generieren (einfach gesagt: eine URL), wird z.B. eine der folgenden App benötigt:
 
