@@ -26,7 +26,7 @@ Die oben aufgeführten Apps sind lediglich eine Empfehlung. Ich übernehme keine
 # Installation / Einrichtung
 1. Die aktuelle Version des Firefox-Addons herunterladen (<a href="https://github.com/FeowM/ImpfCheckAddon/raw/main/firefoxRelease/impfcheck-1.6-fx.xpi" target="_blank">hier</a>) (<b>nur für Windows, Linux und Mac</b>).
 2. Eine der oben aufgeführten App auf dem Smartphone installieren
-3. Die App öffnen und die Einrichtung abschließen (Beim Programm für iOS kann eine Fake-Email-Adresse zur Registrierung angegeben werden). Bei Android die 3 Macros herunterladen (unten aufgelistet) und mit Macrodroid öffnen / installieren. Nähere Informationen zur Einrichtung folgen noch.
+3. Die App öffnen und die Einrichtung abschließen (Beim Programm für iOS kann eine Fake-Email-Adresse zur Registrierung angegeben werden). Bei Android die 3 Macros herunterladen (unten aufgelistet) und mit Macrodroid öffnen / installieren. Nähere Informationen zur Einrichtung für iOS weiter unten.
 4. Am Besten die URL's testweise im Webbrowser öffnen und prüfen, ob eine Benachrichtung auf dem Smartphone angezeigt wird.
 5. Die generierten URL's in der App kopieren und im ImpfCheck-Addon für Firefox unter dem Menüpunkt "Einstellungen" hinzufügen / speichern.
 6. Nun die Seite <a href="https://impfterminservice.de" target="_blank">impfterminservice.de</a> aufrufen.
@@ -54,6 +54,18 @@ Bitte mit "Rechtsklick -> Ziel speichern unter" auf dem Endgerät (Android) absp
   <li>Macro für Vermittlungscode verfügbar - Benachrichtigung: <a href="https://raw.githubusercontent.com/FeowM/ImpfCheckAddon/main/macrodroid_macros/CodeAvail.macro">Download</a></li>
   
 </ul>
+
+
+# iOS - App einrichten
+1. Fake-E-Mail-Adresse zur Registrierung in der App angeben
+2. Unten auf den Tab "Account" klicken
+3. Auf "Reveal API Key" klicken
+4. Den nun angezeigten Code kopieren und mit nachfolgender URL zusammenfügen (Wort APIKEY durch den angezeigten Code ersetzen):
+5. https://push.techulus.com/api/v1/notify/APIKEY?title=Impfung&body=Verfuegbar
+6. Diese URL nun in das ImpfCheck-Addon an entsprechender Stelle einfügen.
+7. Das Wort "Impfung" in der URL kann z.B. durch "Vermittlungscode" oder auch "Error" ersetzt werden. Somit sind weitere verschiedene Benachrichtigungen vorhanden.
+8. Achtung: Bitte keine Umlaute oder Leerzeichen in der URL verwenden!
+
 
 Ich hoffe ich konnte durch dieses Addon dem ein oder anderen etwas helfen.
 Bitte entschuldigt den etwas unsauber programmierten Code. Das ist mein erstes Firefox-Addon und ich wollte es einfach so schnell wie möglich veröffentlichen.
